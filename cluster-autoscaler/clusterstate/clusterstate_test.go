@@ -520,6 +520,17 @@ func TestUpcomingNodes(t *testing.T) {
 	provider.AddNode("ng5", ng5_1)
 	provider.AddNode("ng5", ng5_2)
 
+	// Deleted node should not be counted as an upcoming node.
+	ng6_1 := BuildTestNode("ng6-1", 1000, 1000)
+	ng6_1.Spec.Taints = append(ng6_1.Spec.Taints, apiv1.Taint{
+		Key:    "ToBeDeletedByClusterAutoscaler",
+		Value:  fmt.Sprint(time.Now().Unix()),
+		Effect: apiv1.TaintEffectNoSchedule,
+	})
+	SetNodeReadyState(ng6_1, false, now.Add(-time.Minute))
+	provider.AddNodeGroup("ng6", 1, 10, 1)
+	provider.AddNode("ng6", ng6_1)
+
 	assert.NotNil(t, provider)
 	fakeClient := &fake.Clientset{}
 	fakeLogRecorder, _ := utils.NewStatusMapRecorder(fakeClient, "kube-system", kube_record.NewFakeRecorder(5), false, "my-cool-configmap")
@@ -528,7 +539,7 @@ func TestUpcomingNodes(t *testing.T) {
 		OkTotalUnreadyCount:       1,
 	}, fakeLogRecorder, newBackoff(),
 		NewStaticMaxNodeProvisionTimeProvider(15*time.Minute))
-	err := clusterstate.UpdateNodes([]*apiv1.Node{ng1_1, ng2_1, ng3_1, ng4_1, ng5_1, ng5_2}, nil, now)
+	err := clusterstate.UpdateNodes([]*apiv1.Node{ng1_1, ng2_1, ng3_1, ng4_1, ng5_1, ng5_2, ng6_1}, nil, now)
 	assert.NoError(t, err)
 	assert.Empty(t, clusterstate.GetScaleUpFailures())
 
@@ -543,6 +554,7 @@ func TestUpcomingNodes(t *testing.T) {
 	assert.NotContains(t, upcomingRegistered, "ng4")
 	assert.Equal(t, 0, upcomingNodes["ng5"])
 	assert.Empty(t, upcomingRegistered["ng5"])
+	assert.NotContains(t, upcomingNodes, "ng6")
 }
 
 func TestTaintBasedNodeDeletion(t *testing.T) {
