@@ -163,4 +163,6 @@ type AutoscalingOptions struct {
 	DaemonSetEvictionForEmptyNodes bool
 	// User agent to use for HTTP calls.
 	UserAgent string
+	// DaemonSetEvictionForOccupiedNodes is whether CA will gracefully terminate DaemonSet pods from non-empty nodes.
+	DaemonSetEvictionForOccupiedNodes bool
 }

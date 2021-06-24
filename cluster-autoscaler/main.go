@@ -179,6 +179,7 @@ var (
 	cordonNodeBeforeTerminate          = flag.Bool("cordon-node-before-terminating", false, "Should CA cordon nodes before terminating during downscale process")
 	daemonSetEvictionForEmptyNodes     = flag.Bool("daemonset-eviction-for-empty-nodes", false, "DaemonSet pods will be gracefully terminated from empty nodes")
 	userAgent                          = flag.String("user-agent", "cluster-autoscaler", "User agent used for HTTP calls.")
+	daemonSetEvictionForOccupiedNodes  = flag.Bool("daemonset-eviction-for-occupied-nodes", true, "DaemonSet pods will be gracefully terminated from non-empty nodes")
 )
 
 func createAutoscalingOptions() config.AutoscalingOptions {
@@ -255,6 +256,7 @@ func createAutoscalingOptions() config.AutoscalingOptions {
 		CordonNodeBeforeTerminate:          *cordonNodeBeforeTerminate,
 		DaemonSetEvictionForEmptyNodes:     *daemonSetEvictionForEmptyNodes,
 		UserAgent:                          *userAgent,
+		DaemonSetEvictionForOccupiedNodes:  *daemonSetEvictionForOccupiedNodes,
 	}
 }
 
