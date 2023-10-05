@@ -593,7 +593,7 @@ func TestTaintBasedNodeDeletion(t *testing.T) {
 	assert.Empty(t, clusterstate.GetScaleUpFailures())
 
 	upcomingNodes, upcomingRegistered := clusterstate.GetUpcomingNodes()
-	assert.Equal(t, 1, upcomingNodes["ng1"])
+	assert.Equal(t, 0, upcomingNodes["ng1"])
 	assert.Empty(t, upcomingRegistered["ng1"]) // Only unregistered.
 }
 
